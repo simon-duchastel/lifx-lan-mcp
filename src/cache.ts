@@ -13,7 +13,7 @@ export async function discoverAndCacheDevices(): Promise<any[]> {
   deviceList.forEach((device: any) => {
     deviceCache[device.deviceInfo.label] = {
       mac: device.mac,
-      ip: device.address,
+      ip: device.ip,
       lastUpdated: now
     };
   });

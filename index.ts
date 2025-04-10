@@ -149,7 +149,7 @@ const TURN_OFF_LIGHTS_TOOL: Tool = {
 const server = new Server(
   {
     name: "lifx-lan-mcp",
-    version: "1.1.1",
+    version: "1.1.3",
   },
   {
     capabilities: {
