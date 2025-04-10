@@ -195,7 +195,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const state = await getLightState(label);
         const stateAsString = JSON.stringify(state);
         return {
-          content: [{ type: "text", text: `Light ${label} has state: ${JSON.stringify(state)}` }],
+          content: [{ type: "text", text: `Light ${label} has state: ${stateAsString}` }],
           isError: false,
         };
       }
