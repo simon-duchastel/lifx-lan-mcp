@@ -7,114 +7,85 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
+import { getLights } from "./src/lifx.js";
 
-// const LIST_LIGHTS_TOOL: Tool = {
-//   name: "lifx_lan_list_lights",
-//   description:
-//     "Searches for local businesses and places using Brave's Local Search API. " +
-//     "Best for queries related to physical locations, businesses, restaurants, services, etc. " +
-//     "Returns detailed information including:\n" +
-//     "- Business names and addresses\n" +
-//     "- Ratings and review counts\n" +
-//     "- Phone numbers and opening hours\n" +
-//     "Use this when the query implies 'near me' or mentions specific locations. " +
-//     "Automatically falls back to web search if no local results are found.",
-//   inputSchema: {
-//     type: "object",
-//     properties: {},
-//     required: []
-//   }
-// };
+const LIST_LIGHTS_TOOL: Tool = {
+  name: "lifx_lan_list_lights",
+  description:
+    "List all Lifx lights currently available on the user's local area network (LAN)." +
+    "Each light is specified by a unique string label." +
+    "Use this to get which lights the user wants to interact with, as the label " +
+    "is used in other tools to interact with lights." +
+    "Also includes additional information about the light, such as group and location",
+  inputSchema: {
+    type: "object",
+    properties: {},
+    required: []
+  }
+};
 
-// // Server implementation
-// const server = new Server(
-//   {
-//     name: "lifx-lan-",
-//     version: "0.1.0",
-//   },
-//   {
-//     capabilities: {
-//       tools: {},
-//     },
-//   },
-// );
+// Server implementation
+const server = new Server(
+  {
+    name: "lifx-lan-",
+    version: "0.1.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  },
+);
 
-// // Tool handlers
-// server.setRequestHandler(ListToolsRequestSchema, async () => ({
-//   tools: [],
-// }));
+// Tool handlers
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [],
+}));
   
-// server.setRequestHandler(CallToolRequestSchema, async (request) => {
-//   try {
-//     const { name, arguments: args } = request.params;
-  
-//     if (!args) {
-//       throw new Error("No arguments provided");
-//     }
-  
-//     switch (name) {  
-//       case LIST_LIGHTS_TOOL.name: {
-//         return {
-//           content: [{ type: "text", text: "TODO" }],
-//           isError: false,
-//         };
-//       }
-  
-//       default:
-//         return {
-//           content: [{ type: "text", text: `Unknown tool: ${name}` }],
-//           isError: true,
-//         };
-//     }
-//   } catch (error) {
-//     return {
-//       content: [
-//         {
-//           type: "text",
-//           text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-//         },
-//       ],
-//       isError: true,
-//     };
-//   }
-// });
-
-// async function runServer() {
-//   const transport = new StdioServerTransport();
-//   await server.connect(transport);
-//   console.error("Lifx LAN MCP Server running on stdio");
-// }
-
-// runServer().catch((error) => {
-//   console.error("Fatal error running server:", error);
-//   process.exit(1);
-// });
-
-import { getLights, getLightState, setColorForLight } from "./src/lifx.js";
-
-async function main() {
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
-    const lights = await getLights();
-    await setColorForLight("Cooked Lamp", {
-      hue: 0,
-      saturation: 0,
-      brightness: 0.91089,
-      kelvin: 3879,
-    });
-
-    for (const light of lights) {
-      const state = await getLightState(light.label);
-      
-      console.log(`Light: ${state.label}`);
-      console.log(`Location: ${state.location.label}`);
-      console.log(`Group: ${state.group.label}`);
-      console.log(`Is On: ${state.isOn}`);
-      console.log(`Color:`, state.color);
-      console.log('---');
+    const { name, arguments: args } = request.params;
+  
+    if (!args) {
+      throw new Error("No arguments provided");
+    }
+  
+    switch (name) {  
+      case LIST_LIGHTS_TOOL.name: {
+        const lights = await getLights();
+        const lightsAsString = JSON.stringify(lights);
+        return {
+          content: [{ type: "text", text: lightsAsString }],
+          isError: false,
+        };
+      }
+  
+      default:
+        return {
+          content: [{ type: "text", text: `Unknown tool: ${name}` }],
+          isError: true,
+        };
     }
   } catch (error) {
-    console.error('Error:', error);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+      isError: true,
+    };
   }
+});
+
+async function runServer() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("Lifx LAN MCP Server running on stdio");
 }
 
-main(); 
+runServer().catch((error) => {
+  console.error("Fatal error running server:", error);
+  process.exit(1);
+});
