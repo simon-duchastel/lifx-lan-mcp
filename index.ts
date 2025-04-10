@@ -90,6 +90,31 @@ import {
 //   process.exit(1);
 // });
 
-import { setColorForLight } from "./src/lifx.js";
+import { getLights, getLightState, setColorForLight } from "./src/lifx.js";
 
-await setColorForLight("Cooked Lamp")
+async function main() {
+  try {
+    const lights = await getLights();
+    await setColorForLight("Cooked Lamp", {
+      hue: 0,
+      saturation: 0,
+      brightness: 0.91089,
+      kelvin: 3879,
+    });
+
+    for (const light of lights) {
+      const state = await getLightState(light.label);
+      
+      console.log(`Light: ${state.label}`);
+      console.log(`Location: ${state.location.label}`);
+      console.log(`Group: ${state.group.label}`);
+      console.log(`Is On: ${state.isOn}`);
+      console.log(`Color:`, state.color);
+      console.log('---');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+main(); 
