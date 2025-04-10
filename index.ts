@@ -40,16 +40,17 @@ const GET_LIGHT_STATE_TOOL: Tool = {
   }
 };
 
-const SET_LIGHT_COLOR_TOOL: Tool = {
-  name: "lifx_lan_set_light_color",
-  description: "Set the color of a specific Lifx light. Must specify hue, saturation, brightness, " +
+const SET_LIGHTS_COLOR_TOOL: Tool = {
+  name: "lifx_lan_set_lights_color",
+  description: "Set the color of one or more Lifx lights. Must specify hue, saturation, brightness, " +
   "and may optionally specify kelvin temperature (otherwise 3500 is used).",
   inputSchema: {
     type: "object",
     properties: {
-      label: {
-        type: "string",
-        description: "The label of the Lifx light to set the color for"
+      labels: {
+        type: "array",
+        items: { type: "string" },
+        description: "The label of one or more Lifx lights to set the color for. Array cannot be empty."
       },
       color: {
         type: "object",
@@ -153,7 +154,7 @@ const server = new Server(
       tools: {
         [LIST_LIGHTS_TOOL.name]: LIST_LIGHTS_TOOL,
         [GET_LIGHT_STATE_TOOL.name]: GET_LIGHT_STATE_TOOL,
-        [SET_LIGHT_COLOR_TOOL.name]: SET_LIGHT_COLOR_TOOL,
+        [SET_LIGHTS_COLOR_TOOL.name]: SET_LIGHTS_COLOR_TOOL,
         [TURN_ON_LIGHT_TOOL.name]: TURN_ON_LIGHT_TOOL,
         [TURN_OFF_LIGHT_TOOL.name]: TURN_OFF_LIGHT_TOOL,
       },
@@ -166,7 +167,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     LIST_LIGHTS_TOOL,
     GET_LIGHT_STATE_TOOL,
-    SET_LIGHT_COLOR_TOOL,
+    SET_LIGHTS_COLOR_TOOL,
     TURN_ON_LIGHT_TOOL,
     TURN_OFF_LIGHT_TOOL,
   ],
@@ -200,15 +201,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case SET_LIGHT_COLOR_TOOL.name: {
-        const { label, color, duration = 0 } = args as { 
-          label: string, 
+      case SET_LIGHTS_COLOR_TOOL.name: {
+        const { labels, color, duration = 0 } = args as { 
+          labels: string[], 
           color: { hue: number, saturation: number, brightness: number, kelvin?: number },
           duration?: number 
         };
-        await setColorForLight(label, color, duration);
+        await Promise.all(labels.map(label => setColorForLight(label, color, duration)));
         return {
-          content: [{ type: "text", text: `Successfully set color for light ${label}` }],
+          content: [{ type: "text", text: `Successfully set color for lights ${JSON.stringify(labels)}` }],
           isError: false,
         };
       }
