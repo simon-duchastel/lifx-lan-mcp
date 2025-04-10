@@ -12,8 +12,8 @@ export async function discoverAndCacheDevices(): Promise<any[]> {
   // Update cache with all discovered devices
   deviceList.forEach((device: any) => {
     deviceCache[device.deviceInfo.label] = {
-      mac: device.deviceInfo.mac,
-      ip: device.deviceInfo.address,
+      mac: device.mac,
+      ip: device.address,
       lastUpdated: now
     };
   });

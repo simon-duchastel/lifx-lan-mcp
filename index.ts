@@ -114,8 +114,7 @@ const TURN_ON_LIGHTS_TOOL: Tool = {
             type: "number",
             description: "Color temperature in Kelvin (optional, if not 3500 or previous value is used)"
           }
-        },
-        required: ["hue", "saturation", "brightness"]
+        }
       },
       duration: {
         type: "number",
