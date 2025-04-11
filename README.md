@@ -56,10 +56,23 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
 
 ## Installation
 
+### NPX
 
+Add this, or similar, to your LLM MCP config file (ex. for [Claude Desktop](https://claude.ai/download) this is `claude_desktop_config.json`).
 
-## Usage
-
+```json
+{
+  "mcpServers": {
+    "lifx-lan-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ]
+    }
+  }
+}
+```
 
 ## Development
 
