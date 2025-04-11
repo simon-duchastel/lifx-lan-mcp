@@ -1,5 +1,4 @@
 // @ts-ignore
-import Lifx from 'node-lifx-lan';
 import { Color, Light, LightState } from './types.js';
 import { discoverAndCacheDevices, getOrDiscoverDevice } from './cache.js';
 
