@@ -10,7 +10,8 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
 - Get the current state of lights (color, on/off, labels)
 - Turn lights on/off
 - Change light colors
-- Local network operation (no cloud required, server must be running on the same )
+- Local network operation (no cloud required, server must be running on the same network)
+- Configurable transport (sse or stdio)
 
 ### Tools
 
@@ -72,6 +73,18 @@ Add this, or similar, to your LLM MCP config file (ex. for [Claude Desktop](http
     }
   }
 }
+```
+
+## Configuration
+
+The server can be configured using command-line arguments:
+
+```bash
+# Run on a specific port (default: 3000)
+lifx-lan-mcp --port 8080
+
+# Use stdio transport instead of HTTP
+lifx-lan-mcp --stdio
 ```
 
 ## Development

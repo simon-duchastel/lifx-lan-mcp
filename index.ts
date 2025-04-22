@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { getLights, getLightState, setColorForLight, turnOnLight, turnOff } from "./src/lifx.js";
+import { ServerConfig, DEFAULT_CONFIG, StdioConfig } from "./src/config.js";
+import { parseConfig, runServer } from "./src/cmd.js";
 
 const LIST_LIGHTS_TOOL: Tool = {
   name: "lifx_lan_list_lights",
@@ -258,13 +259,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Lifx LAN MCP Server running on stdio");
+// parse config and run the server
+const args = process.argv.slice(2);
+var config: ServerConfig | null | undefined = parseConfig(args)
+if (config === null) {
+  config = DEFAULT_CONFIG
 }
-
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
+if (config === undefined) {
+  process.exit(1);
+}
+runServer(config, server).catch((error) => {
+  console.error("Fatal error running server: ", error);
   process.exit(1);
 });
