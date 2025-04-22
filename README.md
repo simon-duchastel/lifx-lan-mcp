@@ -13,6 +13,90 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
 - Local network operation (no cloud required, server must be running on the same network)
 - Configurable transport (sse or stdio)
 
+## Installation
+
+### NPX (configuring via local stdio) - default
+
+Add this, or similar, to your LLM MCP config file (ex. for [Claude Desktop](https://claude.ai/download) this is `claude_desktop_config.json`).
+
+```json
+{
+  "mcpServers": {
+    "lifx-lan-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "lifx-lan-mcp"
+      ]
+    }
+  }
+}
+```
+
+### Running the Server
+
+The server can be run in two modes: stdio (default) or HTTP server mode. The server supports both the 2025-03-26 and 2024-11-26 protocol versions.
+
+### Stdio Mode (Default)
+
+Stdio mode is the simplest way to run the server, where it communicates directly with the LLM through standard input/output. This is the default mode and requires no additional configuration. In this mode, the MCP server
+is started directly by the client with which it's communicating.
+
+```bash
+# Run in stdio mode (default)
+npx lifx-lan-mcp
+
+# Or explicitly specify stdio mode
+npx lifx-lan-mcp --mode stdio
+```
+
+### HTTP Server Mode
+
+> **WARNING:** HTTP SERVER MODE IS DANGEROUS. It currently doesn't support authentication, which means attackers could trick your LLM into giving it data or alternatively allow malicious clients to control your LIFX lights. Use at your own risk until authentication is supported.
+
+HTTP server mode allows the server to run as a standalone service that can be accessed over HTTP. This is useful when you want to run the server separately from the LLM client, ex. over a network.
+
+
+```bash
+# Run in HTTP server mode on default port (3000)
+npx lifx-lan-mcp --mode sse
+
+# Run in HTTP server mode on a specific port
+npx lifx-lan-mcp --mode sse --port 8080
+```
+
+#### Protocol Versions
+
+The HTTP server supports two protocol versions:
+
+1. **2025-04-21 Protocol** (Latest)
+   - Uses `/mcp` endpoint for all operations
+   - Supports both HTTP and SSE transports
+   - Example client configuration:
+   ```json
+   {
+     "mcpServers": {
+       "lifx-lan-mcp": {
+         "url": "http://localhost:3000/mcp"
+       }
+     }
+   }
+   ```
+
+2. **2025-03-26 Protocol** (Legacy)
+   - Uses `/sse` endpoint for establishing connections
+   - Uses `/message` endpoint for sending messages
+   - Example client configuration:
+   ```json
+   {
+     "mcpServers": {
+       "lifx-lan-mcp": {
+         "url": "http://localhost:3000/sse"
+       }
+     }
+   }
+   ```
+
 ### Tools
 
 - **lifx_lan_list_lights**
@@ -54,38 +138,6 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
     - `labels` (string[]): Array of light labels to turn off
     - `duration` (number, optional): Transition duration in milliseconds
 
-
-## Installation
-
-### NPX
-
-Add this, or similar, to your LLM MCP config file (ex. for [Claude Desktop](https://claude.ai/download) this is `claude_desktop_config.json`).
-
-```json
-{
-  "mcpServers": {
-    "lifx-lan-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-brave-search"
-      ]
-    }
-  }
-}
-```
-
-## Configuration
-
-The server can be configured using command-line arguments:
-
-```bash
-# Run on a specific port (default: 3000)
-lifx-lan-mcp --port 8080
-
-# Use stdio transport instead of HTTP
-lifx-lan-mcp --stdio
-```
 
 ## Development
 
