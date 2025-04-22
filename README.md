@@ -35,7 +35,7 @@ Add this, or similar, to your LLM MCP config file (ex. for [Claude Desktop](http
 
 ### Running the Server
 
-The server can be run in two modes: stdio (default) or HTTP server mode. The server supports both the 2025-03-26 and 2024-11-26 protocol versions.
+The server can be run in two modes: stdio (default) or HTTP server mode. The server supports both the 2025-03-26 and 2024-11-05 protocol versions.
 
 ### Stdio Mode (Default)
 
