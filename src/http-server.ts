@@ -25,6 +25,10 @@ export class HttpServer {
     this.app = express();
     this.app.use(cors());
     this.app.use(express.json());
+    this.app.use((_, res, next) => {
+      res.setTimeout(SERVER_TIMEOUT_SECONDS);
+      next();
+    });
 
     this.mcpServerBuilder = mcpServerBuilder;
 
