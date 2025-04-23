@@ -46,14 +46,17 @@ export function parseConfig(args: string[]): ServerConfig | null | undefined {
   
 export async function runServer(
   config: ServerConfig = DEFAULT_CONFIG,
-  server: Server,
+  serverBuilder: () => Server,
 ) {  
   if (config.mode === 'stdio') {
     const transport = new StdioServerTransport();
-    await server.connect(transport);
+    await serverBuilder().connect(transport);
     console.log("Lifx LAN MCP Server running on stdio");
   } else if (config.mode === 'sse') {
-    const httpServer = new HttpServer(config, server);
+    console.log("===WARNING===");
+    console.log("THIS IS DANGROUS. Running an MCP server over HTTP without authentication is very dangerous. Use at your own risk");
+    console.log("===WARNING===");
+    const httpServer = new HttpServer(config, serverBuilder);
     await httpServer.start()
     console.log(`Lifx LAN MCP Server running on port ${config.port}`);
   } else {
