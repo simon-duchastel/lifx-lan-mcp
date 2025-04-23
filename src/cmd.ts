@@ -54,7 +54,8 @@ export async function runServer(
     console.log("Lifx LAN MCP Server running on stdio");
   } else if (config.mode === 'sse') {
     console.log("===WARNING===");
-    console.log("Running an MCP server over HTTP without authentication is very dangerous. Use at your own risk");
+    console.log("THIS IS DANGROUS. Running an MCP server over HTTP without authentication is very dangerous. Use at your own risk");
+    console.log("===WARNING===");
     const httpServer = new HttpServer(config, serverBuilder);
     await httpServer.start()
     console.log(`Lifx LAN MCP Server running on port ${config.port}`);

@@ -7,6 +7,9 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 
+
+const SERVER_TIMEOUT_SECONDS = 60 * 60; // 1hr timeout, given these streams might be long-lasting
+
 export class HttpServer {
   private app: express.Application;
   private mcpServerBuilder: () => Server;
@@ -54,10 +57,6 @@ export class HttpServer {
           console.log(`MCP server closed for session ${sessionId}`);
         }
         await server.connect(transport);
-
-        // Start the SSE transport to begin streaming
-        // This sends an initial 'endpoint' event with the session ID in the URL
-        await transport.start();
 
         console.log(`Established SSE stream with session ID: ${sessionId}`);
       } catch (error) {
@@ -111,7 +110,7 @@ export class HttpServer {
         const eventStore = new InMemoryEventStore();
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
-          eventStore,
+          eventStore: eventStore,
           onsessioninitialized: (sessionId) => {
             this.transports[sessionId] = transport;
           },
