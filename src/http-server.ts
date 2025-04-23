@@ -8,7 +8,7 @@ import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/in
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 
 
-const SERVER_TIMEOUT_SECONDS = 60 * 60; // 1hr timeout, given these streams might be long-lasting
+const SERVER_TIMEOUT_MS = 10 * 60 * 1000; // 10MIN timeout, given these streams might be long-lasting
 
 export class HttpServer {
   private app: express.Application;
@@ -26,7 +26,7 @@ export class HttpServer {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use((_, res, next) => {
-      res.setTimeout(SERVER_TIMEOUT_SECONDS);
+      res.setTimeout(SERVER_TIMEOUT_MS);
       next();
     });
 
