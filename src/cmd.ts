@@ -46,14 +46,14 @@ export function parseConfig(args: string[]): ServerConfig | null | undefined {
   
 export async function runServer(
   config: ServerConfig = DEFAULT_CONFIG,
-  server: Server,
+  serverBuilder: () => Server,
 ) {  
   if (config.mode === 'stdio') {
     const transport = new StdioServerTransport();
-    await server.connect(transport);
+    await serverBuilder().connect(transport);
     console.log("Lifx LAN MCP Server running on stdio");
   } else if (config.mode === 'sse') {
-    const httpServer = new HttpServer(config, server);
+    const httpServer = new HttpServer(config, serverBuilder);
     await httpServer.start()
     console.log(`Lifx LAN MCP Server running on port ${config.port}`);
   } else {

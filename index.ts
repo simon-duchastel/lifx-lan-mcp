@@ -147,117 +147,120 @@ const TURN_OFF_LIGHTS_TOOL: Tool = {
 };
 
 // Server implementation
-const server = new Server(
-  {
-    name: "lifx-lan-mcp",
-    version: "1.1.3",
-  },
-  {
-    capabilities: {
-      tools: {
-        [LIST_LIGHTS_TOOL.name]: LIST_LIGHTS_TOOL,
-        [GET_LIGHTS_STATE_TOOL.name]: GET_LIGHTS_STATE_TOOL,
-        [SET_LIGHTS_COLOR_TOOL.name]: SET_LIGHTS_COLOR_TOOL,
-        [TURN_ON_LIGHTS_TOOL.name]: TURN_ON_LIGHTS_TOOL,
-        [TURN_OFF_LIGHTS_TOOL.name]: TURN_OFF_LIGHTS_TOOL,
+const server = () => {
+  const _server = new Server(
+    {
+      name: "lifx-lan-mcp",
+      version: "1.1.3",
+    },
+    {
+      capabilities: {
+        tools: {
+          [LIST_LIGHTS_TOOL.name]: LIST_LIGHTS_TOOL,
+          [GET_LIGHTS_STATE_TOOL.name]: GET_LIGHTS_STATE_TOOL,
+          [SET_LIGHTS_COLOR_TOOL.name]: SET_LIGHTS_COLOR_TOOL,
+          [TURN_ON_LIGHTS_TOOL.name]: TURN_ON_LIGHTS_TOOL,
+          [TURN_OFF_LIGHTS_TOOL.name]: TURN_OFF_LIGHTS_TOOL,
+        },
       },
     },
-  },
-);
+  );
 
-// Tool handlers
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [
-    LIST_LIGHTS_TOOL,
-    GET_LIGHTS_STATE_TOOL,
-    SET_LIGHTS_COLOR_TOOL,
-    TURN_ON_LIGHTS_TOOL,
-    TURN_OFF_LIGHTS_TOOL,
-  ],
-}));
-  
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  try {
-    const { name, arguments: args } = request.params;
-  
-    if (!args) {
-      throw new Error("No arguments provided");
+  // Tool handlers
+  _server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [
+      LIST_LIGHTS_TOOL,
+      GET_LIGHTS_STATE_TOOL,
+      SET_LIGHTS_COLOR_TOOL,
+      TURN_ON_LIGHTS_TOOL,
+      TURN_OFF_LIGHTS_TOOL,
+    ],
+  }));
+    
+  _server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    try {
+      const { name, arguments: args } = request.params;
+    
+      if (!args) {
+        throw new Error("No arguments provided");
+      }
+    
+      switch (name) {  
+        case LIST_LIGHTS_TOOL.name: {
+          const lights = await getLights();
+          const lightsAsString = JSON.stringify(lights);
+          return {
+            content: [{ type: "text", text: `Lights: ${lightsAsString}` }],
+            isError: false,
+          };
+        }
+
+        case GET_LIGHTS_STATE_TOOL.name: {
+          const { labels } = args as { labels: string[] };
+          const states = await Promise.all(labels.map(label => getLightState(label)));
+          const state = Object.fromEntries(labels.map((label, i) => [label, states[i]]));
+          const stateAsString = JSON.stringify(state);
+          return {
+            content: [{ type: "text", text: `Lights ${labels} are in the following states: ${stateAsString}` }],
+            isError: false,
+          };
+        }
+
+        case SET_LIGHTS_COLOR_TOOL.name: {
+          const { labels, color, duration = 0 } = args as { 
+            labels: string[], 
+            color: { hue: number, saturation: number, brightness: number, kelvin?: number },
+            duration?: number 
+          };
+          await Promise.all(labels.map(label => setColorForLight(label, color, duration)));
+          return {
+            content: [{ type: "text", text: `Successfully set color for lights ${JSON.stringify(labels)}` }],
+            isError: false,
+          };
+        }
+
+        case TURN_ON_LIGHTS_TOOL.name: {
+          const { labels, color, duration = 0 } = args as { 
+            labels: string[], 
+            color?: { hue: number, saturation: number, brightness: number, kelvin?: number },
+            duration?: number 
+          };
+          await Promise.all(labels.map(label => turnOnLight(label, color, duration)));
+          return {
+            content: [{ type: "text", text: `Successfully turned on lights ${JSON.stringify(labels)}` }],
+            isError: false,
+          };
+        }
+
+        case TURN_OFF_LIGHTS_TOOL.name: {
+          const { labels, duration = 0 } = args as { labels: string[], duration?: number };
+          await Promise.all(labels.map(label => turnOff(label, duration)));
+          return {
+            content: [{ type: "text", text: `Successfully turned off lights ${JSON.stringify(labels)}` }],
+            isError: false,
+          };
+        }
+    
+        default:
+          return {
+            content: [{ type: "text", text: `Unknown tool: ${name}` }],
+            isError: true,
+          };
+      }
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+        isError: true,
+      };
     }
-  
-    switch (name) {  
-      case LIST_LIGHTS_TOOL.name: {
-        const lights = await getLights();
-        const lightsAsString = JSON.stringify(lights);
-        return {
-          content: [{ type: "text", text: `Lights: ${lightsAsString}` }],
-          isError: false,
-        };
-      }
-
-      case GET_LIGHTS_STATE_TOOL.name: {
-        const { labels } = args as { labels: string[] };
-        const states = await Promise.all(labels.map(label => getLightState(label)));
-        const state = Object.fromEntries(labels.map((label, i) => [label, states[i]]));
-        const stateAsString = JSON.stringify(state);
-        return {
-          content: [{ type: "text", text: `Lights ${labels} are in the following states: ${stateAsString}` }],
-          isError: false,
-        };
-      }
-
-      case SET_LIGHTS_COLOR_TOOL.name: {
-        const { labels, color, duration = 0 } = args as { 
-          labels: string[], 
-          color: { hue: number, saturation: number, brightness: number, kelvin?: number },
-          duration?: number 
-        };
-        await Promise.all(labels.map(label => setColorForLight(label, color, duration)));
-        return {
-          content: [{ type: "text", text: `Successfully set color for lights ${JSON.stringify(labels)}` }],
-          isError: false,
-        };
-      }
-
-      case TURN_ON_LIGHTS_TOOL.name: {
-        const { labels, color, duration = 0 } = args as { 
-          labels: string[], 
-          color?: { hue: number, saturation: number, brightness: number, kelvin?: number },
-          duration?: number 
-        };
-        await Promise.all(labels.map(label => turnOnLight(label, color, duration)));
-        return {
-          content: [{ type: "text", text: `Successfully turned on lights ${JSON.stringify(labels)}` }],
-          isError: false,
-        };
-      }
-
-      case TURN_OFF_LIGHTS_TOOL.name: {
-        const { labels, duration = 0 } = args as { labels: string[], duration?: number };
-        await Promise.all(labels.map(label => turnOff(label, duration)));
-        return {
-          content: [{ type: "text", text: `Successfully turned off lights ${JSON.stringify(labels)}` }],
-          isError: false,
-        };
-      }
-  
-      default:
-        return {
-          content: [{ type: "text", text: `Unknown tool: ${name}` }],
-          isError: true,
-        };
-    }
-  } catch (error) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ],
-      isError: true,
-    };
-  }
-});
+  });
+  return _server;
+}
 
 // parse config and run the server
 const args = process.argv.slice(2);
