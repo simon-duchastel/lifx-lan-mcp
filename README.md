@@ -1,5 +1,7 @@
 # LIFX LAN MCP
 
+![npm](https://img.shields.io/npm/v/lifx-lan-mcp)&nbsp;[![MCP Server](https://badge.mcpx.dev/?type=server)](https://modelcontextprotocol.io/introduction)&nbsp;[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/simonduchastel)
+
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server for allowing an LLM to control LIFX lights over your local area network (LAN), without cloud connectivity.
 
 **Note** that the MCP server must be running on the same wifi network as your LIFX lights in order for the tool to work.
@@ -173,16 +175,8 @@ The MCP definition is found in [index.ts](index.ts), which contains all of the t
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## Contact
 
-Simon Duchastel
+Feel free to reach out at [lifx-lan-mcp@duchastel.com](mailto:lifx-lan-mcp@duchastel.com) or by [opening a GitHub issue](https://github.com/simon-duchastel/lifx-lan-mcp/issues).
 
-Feel free to reach out at [lifx-lan-mcp@duchastel.com](mailto:lifx-lan-mcp@duchastel.com).
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Support
-
-For support, please [open an issue](https://github.com/simon-duchastel/lifx-lan-mcp/issues) on GitHub. 
+If you find this project useful, you can [buy me a coffee](https://buymeacoffee.com/simonduchastel).
