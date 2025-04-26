@@ -1,6 +1,6 @@
 # LIFX LAN MCP
 
-![npm](https://img.shields.io/npm/v/lifx-lan-mcp)&nbsp;[![MCP Server](https://badge.mcpx.dev/?type=server)](https://modelcontextprotocol.io/introduction)&nbsp;[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/simonduchastel)
+[![npm](https://img.shields.io/npm/v/lifx-lan-mcp)](https://www.npmjs.com/package/lifx-lan-mcp)&nbsp;[![MCP Server](https://badge.mcpx.dev/?type=server)](https://modelcontextprotocol.io/introduction)&nbsp;[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/simonduchastel)
 
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server for allowing an LLM to control LIFX lights over your local area network (LAN), without cloud connectivity.
 
