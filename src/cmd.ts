@@ -34,6 +34,10 @@ export function parseConfig(args: string[]): ServerConfig | null | undefined {
     console.error(`Fatal error running server: mode '${mode}' is incompatible with --port, 'sse' mode expected`);
     return undefined;
   }
+  if (mode === 'sse' && port === undefined) {
+    console.error(`Fatal error running server: you must specify an integer port with --port <port> when running in 'sse' mode`);
+    return undefined;
+  }
   if (mode === undefined || (mode != 'sse' && mode !== 'stdio')) {
     console.error(`Fatal error running server: mode expected, must be one of 'sse' or 'stdio'`);
     return undefined;
